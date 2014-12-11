@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+$consolatorFile = __DIR__ . '/../build/consolator.phar';
+
+if(!is_file($consolatorFile)) {
+    exit("\n WARNING! Consolator should be compiled! Run './bin/compile'\n\n");
+}
+
+require_once($consolatorFile);
+
+$application = \AlexanderC\Consolator\bootstrap([
+    'commandPaths' => __DIR__,
+    'autoload' => ["AlexanderC\\Consolator\\Test\\" => __DIR__]
+]);
+
+$application->terminate($application->run());

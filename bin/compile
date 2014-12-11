@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @param string $outputFile
+ */
+function compile($outputFile)
+{
+    $phar = new \Phar($outputFile, 0, basename($outputFile));
+    $phar->setSignatureAlgorithm(\Phar::SHA1);
+
+    $recursiveDirectoryIterator = new \RecursiveDirectoryIterator(__DIR__ . '/../src');
+    $mainRecursiveIterator = new \RecursiveIteratorIterator($recursiveDirectoryIterator);
+
+    $phar->buildFromIterator($mainRecursiveIterator, realpath(__DIR__ . '/../'));
+    $phar->setStub($phar->createDefaultStub('src/bootstrap.php'));
+}
+
+compile(__DIR__ . '/../build/consolator.phar');
