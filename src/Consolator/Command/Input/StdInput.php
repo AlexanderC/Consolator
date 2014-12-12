@@ -18,21 +18,6 @@ use AlexanderC\Consolator\Command\Input\Exceptions\MissingInputException;
 class StdInput extends AbstractInput
 {
     /**
-     * @var array
-     */
-    protected $arguments = [];
-
-    /**
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * @var array
-     */
-    protected $longOptions = [];
-
-    /**
      * @param array $input
      */
     public function __construct(array $input)
@@ -92,17 +77,14 @@ class StdInput extends AbstractInput
     }
 
     /**
-     * @param $name
+     * @param string $name
+     * @param mixed $defaultValue
      * @param int $type
      * @return string
      * @throws MissingInputException
      */
-    public function get($name, $type = self::ALL)
+    public function get($name, $defaultValue = null, $type = self::ALL)
     {
-        if(!$this->has($name, $type)) {
-            throw new MissingInputException(sprintf("No such input of type '%d' and name '%s'", $type, $name));
-        }
-
-        return $this->all($type)[$name];
+        return $this->has($name, $type) ? $this->all($type)[$name] : $defaultValue;
     }
 } 

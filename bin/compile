@@ -2,18 +2,161 @@
 <?php
 
 /**
- * @param string $outputFile
+ * Class Compiler
  */
-function compile($outputFile)
+class Compiler
 {
-    $phar = new \Phar($outputFile, 0, basename($outputFile));
-    $phar->setSignatureAlgorithm(\Phar::SHA1);
+    /**
+     * @var string
+     */
+    protected $outputFile;
 
-    $recursiveDirectoryIterator = new \RecursiveDirectoryIterator(__DIR__ . '/../src');
-    $mainRecursiveIterator = new \RecursiveIteratorIterator($recursiveDirectoryIterator);
+    /**
+     * @var string
+     */
+    protected $alias;
 
-    $phar->buildFromIterator($mainRecursiveIterator, realpath(__DIR__ . '/../'));
-    $phar->setStub($phar->createDefaultStub('src/bootstrap.php'));
+    /**
+     * @param string $outputFile
+     */
+    function __construct($outputFile)
+    {
+        $this->outputFile = $outputFile;
+        $this->alias = basename($outputFile);
+    }
+
+    /**
+     * @param bool $shebang
+     */
+    public function compile($shebang = false)
+    {
+        $phar = new \Phar($this->outputFile, 0, $this->alias);
+        $phar->setSignatureAlgorithm(\Phar::SHA1);
+
+        $recursiveDirectoryIterator = new \RecursiveDirectoryIterator(__DIR__ . '/../src');
+        $mainRecursiveIterator = new \RecursiveIteratorIterator($recursiveDirectoryIterator);
+
+        $phar->startBuffering();
+
+        /** @var \SplFileInfo $fileInfo */
+        foreach($mainRecursiveIterator as $fileInfo) {
+            if (strtolower($fileInfo->getExtension()) === 'php') {
+                $this->addFile($phar, $fileInfo);
+            }
+        }
+
+        $phar->setStub($this->getStub($shebang));
+
+        $phar->stopBuffering();
+    }
+
+    /**
+     * @param string $source
+     * @return string
+     */
+    protected function stripWhitespace($source)
+    {
+        if (!function_exists('token_get_all')) {
+            return $source;
+        }
+
+        $output = '';
+
+        foreach (token_get_all($source) as $token) {
+            if (is_string($token)) {
+                $output .= $token;
+            } elseif (in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
+                $output .= str_repeat("\n", substr_count($token[1], "\n"));
+            } elseif (T_WHITESPACE === $token[0]) {
+                // reduce wide spaces
+                $whitespace = preg_replace('{[ \t]+}', ' ', $token[1]);
+                // normalize newlines to \n
+                $whitespace = preg_replace('{(?:\r\n|\r|\n)}', "\n", $whitespace);
+                // trim leading spaces
+                $whitespace = preg_replace('{\n +}', "\n", $whitespace);
+                $output .= $whitespace;
+            } else {
+                $output .= $token[1];
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param bool $shebang
+     * @return string
+     */
+    protected function getStub($shebang)
+    {
+        $prefix = $shebang ? "#!/usr/bin/env php\n<?php" : "<?php";
+
+        return <<<EOF
+{$prefix}
+
+if(strtolower(php_sapi_name()) !== 'cli') {
+    throw new \RuntimeException("CLI sapi is only allowed.");
 }
 
-compile(__DIR__ . '/../build/consolator.phar');
+\Phar::mapPhar('{$this->alias}');
+
+require 'phar://{$this->alias}/src/bootstrap.php';
+
+global \$argv;
+
+if(basename(\$argv[0]) === basename(__FILE__)) {
+    \$mainScript = array_shift(\$argv);
+
+    array_unshift(\$argv, 'run');
+    array_unshift(\$argv, \$mainScript);
+
+    \$application = \AlexanderC\Consolator\bootstrap([
+        'autoload' => []
+    ]);
+    \$application->terminate(\$application->run());
+}
+
+__HALT_COMPILER();
+EOF;
+    }
+
+    /**
+     * @param Phar $phar
+     * @param SplFileInfo $fileInfo
+     * @param bool $strip
+     */
+    protected function addFile(\Phar $phar, \SplFileInfo $fileInfo, $strip = true)
+    {
+        $prefixToStrip = realpath(__DIR__ . '/../');
+        $realPath = $fileInfo->getRealPath();
+        $relativePath = mb_substr($realPath, mb_strlen($prefixToStrip));
+        $content = file_get_contents($fileInfo->getRealPath());
+
+        if($strip) {
+            $content = $this->stripWhitespace($content);
+        }
+
+        $content = $this->stripWhitespace($content);
+
+        $phar->addFromString($relativePath, $content);
+    }
+}
+
+$pharBinaryNoShebang = __DIR__ . '/../build/consolator.noshebang.phar';
+$pharBinary = __DIR__ . '/../build/consolator.phar';
+
+if(is_file($pharBinary)) {
+    unlink($pharBinary);
+}
+
+$compiler = new Compiler($pharBinary);
+
+$compiler->compile($shebang = false);
+rename($pharBinary, $pharBinaryNoShebang);
+$compiler->compile($shebang = true);
+
+passthru(sprintf("chmod +x %s", escapeshellarg($pharBinary)));
+
+echo "  Successfully compiled.\n";
+
+exit(0);

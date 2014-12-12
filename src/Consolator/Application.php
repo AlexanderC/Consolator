@@ -11,6 +11,7 @@ namespace AlexanderC\Consolator;
 
 use AlexanderC\Consolator\Command\Implementation\HelpCommand;
 use AlexanderC\Consolator\Command\Implementation\ListCommand;
+use AlexanderC\Consolator\Command\Implementation\RunCommand;
 use AlexanderC\Consolator\Command\Input\AbstractInput;
 use AlexanderC\Consolator\Command\Input\StdInput;
 use AlexanderC\Consolator\Command\Output\AbstractOutput;
@@ -39,11 +40,17 @@ class Application
     protected $commands;
 
     /**
+     * @var string
+     */
+    protected $mainScript;
+
+    /**
      * @var array
      */
     protected $internalCommands = [
         HelpCommand::class,
-        ListCommand::class
+        ListCommand::class,
+        RunCommand::class
     ];
 
     /**
@@ -73,33 +80,33 @@ class Application
     }
 
     /**
+     * @return string
+     */
+    public function getMainScript()
+    {
+        return $this->mainScript;
+    }
+
+    /**
+     * @param string $commandName
+     * @return AbstractCommand
+     */
+    public function resolveCommand($commandName)
+    {
+        return $this->commands->resolve($commandName);
+    }
+
+    /**
+     * @param AbstractCommand $command
      * @param AbstractInput $input
      * @param AbstractOutput $output
      * @return int
      */
-    public function run($input = null, $output = null)
+    public function runCommand(AbstractCommand $command, $input = null, $output = null)
     {
-        global $argv;
-
-        $mainScript = array_shift($argv);
-        $commandName = array_shift($argv) ? : HelpCommand::NAME;
-
-        $input = is_object($input) && $input instanceof AbstractInput ? $input : new StdInput($argv);
-        $output = is_object($output) && $output instanceof AbstractOutput ? $output : new StdOutput();
-
-        $command = $this->commands->resolve($commandName);
-        $result = 0;
+        $result = AbstractCommand::SUCCESS;
 
         try {
-            if(null === $command) {
-                $guessedCommandName = $this->commands->guess($commandName);
-
-                throw new \RuntimeException(sprintf(
-                    "Did you mean /f[inverted]%s/!f/b[white]/f[red]?",
-                    $guessedCommandName
-                ));
-            }
-
             if($input->has(self::HELP_OPTION, AbstractInput::LONG_OPTION)) {
                 $output->write("/f[green]Help for '%s': /!f", [$command->getName()]);
                 $output->writeln("/f[inverted+green]%s/!f", [$command->getHelp()]);
@@ -107,7 +114,7 @@ class Application
                 $result = $command->run($input, $output);
             }
         } catch(\Exception $e) {
-            $result = 1;
+            $result = AbstractCommand::ERROR;
             $output->writeln('/b[white]/f[red][%s] %s/!f', [get_class($e), $e->getMessage()]);
         }
 
@@ -117,9 +124,49 @@ class Application
     }
 
     /**
+     * @param string $name
+     * @return string
+     */
+    public function guessCommand($name)
+    {
+        return $this->commands->guess($name);
+    }
+
+    /**
+     * @param AbstractInput $input
+     * @param AbstractOutput $output
+     * @return int
+     */
+    public function run($input = null, $output = null)
+    {
+        global $argv;
+
+        $this->mainScript = array_shift($argv);
+        $commandName = array_shift($argv) ? : HelpCommand::NAME;
+
+        $input = is_object($input) && $input instanceof AbstractInput ? $input : new StdInput($argv);
+        $output = is_object($output) && $output instanceof AbstractOutput ? $output : new StdOutput();
+
+        $command = $this->resolveCommand($commandName);
+
+        if(null === $command) {
+            $guessedCommandName = $this->guessCommand($commandName);
+
+            $output->writeln(
+                '/b[white]/f[red]Did you mean /f[inverted]%s/!f/b[white]/f[red]?/!f',
+                [$guessedCommandName]
+            );
+
+            return AbstractCommand::ERROR;
+        }
+
+        return $this->runCommand($command, $input, $output);
+    }
+
+    /**
      * @param int $code
      */
-    public function terminate($code = 0)
+    public function terminate($code = AbstractCommand::SUCCESS)
     {
         exit($code);
     }
@@ -134,7 +181,7 @@ class Application
         $commandPaths = is_array($commandPaths) ? $commandPaths : [$commandPaths];
 
         if(!is_array($autoloadMapping)) {
-            require_once(__DIR__ . '/Exception/ConfigurationException.php');
+            require_once('./Exception/ConfigurationException.php');
             throw new ConfigurationException(
                 "Autoload mapping should be an array that consists from class prefix" .
                 " and the path where the classes are located"
@@ -169,31 +216,45 @@ class Application
             $iterator = new \DirectoryIterator($path);
 
             foreach($iterator as $fileInfo) {
-                $filePath = $fileInfo->getRealPath();
-                $escapedFilePath = escapeshellarg($fileInfo->getRealPath());
+                $commandInstance = $this->registerCommandFile($fileInfo);
 
-                if($fileInfo->isFile() && $fileInfo->isReadable()
-                    && 'php' === strtolower($fileInfo->getExtension())
-                    && preg_match(self::COMMAND_REGEX, `head -1 {$escapedFilePath}`, $matches)) {
-                    require_once($filePath);
-
-                    $command = $matches['commandClass'];
-                    /** @var AbstractCommand $commandInstance */
-                    $commandInstance = new $command();
-
-                    if(!($commandInstance instanceof AbstractCommand)) {
-                        throw new \RuntimeException(sprintf(
-                            "Command '%s' MUST extend '%s' class",
-                            $command,
-                            AbstractCommand::class
-                        ));
-                    }
-
-                    $commandInstance->setApplication($this);
-
+                if($commandInstance instanceof AbstractCommand) {
                     $this->commands->add($commandInstance);
                 }
             }
         }
+    }
+
+    /**
+     * @param \SplFileInfo $fileInfo
+     * @return AbstractCommand
+     */
+    public function registerCommandFile(\SplFileInfo $fileInfo)
+    {
+        $filePath = $fileInfo->getRealPath();
+        $escapedFilePath = escapeshellarg($fileInfo->getRealPath());
+        $commandInstance = null;
+
+        if($fileInfo->isFile() && $fileInfo->isReadable()
+            && 'php' === strtolower($fileInfo->getExtension())
+            && preg_match(self::COMMAND_REGEX, `head -1 {$escapedFilePath}`, $matches)) {
+            require_once($filePath);
+
+            $command = $matches['commandClass'];
+            /** @var AbstractCommand $commandInstance */
+            $commandInstance = new $command();
+
+            if(!($commandInstance instanceof AbstractCommand)) {
+                throw new \RuntimeException(sprintf(
+                    "Command '%s' MUST extend '%s' class",
+                    $command,
+                    AbstractCommand::class
+                ));
+            }
+
+            $commandInstance->setApplication($this);
+        }
+
+        return $commandInstance;
     }
 } 

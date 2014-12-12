@@ -64,6 +64,6 @@ class ListCommand extends AbstractCommand
 
         $output->writeln("");
 
-        return 0;
+        return self::SUCCESS;
     }
 } 

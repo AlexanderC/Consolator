@@ -22,6 +22,8 @@ abstract class AbstractCommand
 {
     use ApplicationAwareTrait;
 
+    const SUCCESS = 0;
+    const ERROR = 1;
     const NO_HELP = 'There are no special options or arguments available';
 
     /**

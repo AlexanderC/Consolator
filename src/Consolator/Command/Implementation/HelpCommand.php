@@ -62,6 +62,6 @@ class HelpCommand extends AbstractCommand
 EOF;
         $output->writeln($text);
 
-        return 0;
+        return self::SUCCESS;
     }
 } 

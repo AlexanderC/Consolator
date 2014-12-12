@@ -11,7 +11,7 @@ namespace AlexanderC\Consolator;
 set_time_limit(0);
 
 define("CSL_CLASS_PREFIX", "AlexanderC\\Consolator\\");
-define("CSL_LIB_PATH", __DIR__ . "/Consolator/");
+define("CSL_LIB_PATH", "./Consolator/");
 
 /**
  * @param array $configArray
@@ -19,10 +19,6 @@ define("CSL_LIB_PATH", __DIR__ . "/Consolator/");
  */
 function bootstrap(array $configArray = null)
 {
-    if (php_sapi_name() != 'cli') {
-        throw new \RuntimeException("CLI sapi is only allowed.");
-    }
-
     require_once(CSL_LIB_PATH . 'Config.php');
     require_once(CSL_LIB_PATH . 'Application.php');
 
@@ -38,8 +34,6 @@ function bootstrap(array $configArray = null)
     }
 
     $configArray[Config::AUTOLOAD_MAPPING][CSL_CLASS_PREFIX] = CSL_LIB_PATH;
-    // TODO: fix failing inside phar archives
-    //$configArray[Config::COMMAND_PATHS][] = CSL_LIB_PATH . 'Command/Implementation/';
 
     $config = Config::fromArray($configArray);
 
