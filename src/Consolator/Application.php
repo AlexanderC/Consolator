@@ -195,7 +195,11 @@ class Application
             spl_autoload_register(function($class) use ($classPrefix, $path) {
                 if(false !== stripos($class, $classPrefix)) {
                     $fileBase = str_replace('\\', '/', mb_substr($class, mb_strlen($classPrefix) - 1));
-                    require_once($path . ltrim($fileBase, '/') . '.php');
+                    $realFilePath = $path . ltrim($fileBase, '/') . '.php';
+
+                    if(is_file($realFilePath)) {
+                        require_once($realFilePath);
+                    }
                 }
 
                 return false;

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require_once(__DIR__ . '/../build/consolator.noshebang.phar');
+require_once('consolator.phar');
 
 $application = \AlexanderC\Consolator\bootstrap([
     'commandPaths' => __DIR__,
