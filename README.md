@@ -82,7 +82,7 @@ $p->command = function($i, $o) {
     return 0;
 };
 
-// ...run it: consolator ./test/cmd.php --proto
+// ...run it: consolator ./test/cmd.php --name="John Doe" --proto
 ```
 
 For more examples check `./test/` directory.
