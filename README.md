@@ -18,8 +18,12 @@ Run the following command from console
 Usage
 =====
 
-Using command line util
-`consolator list`
+Using command line util:
+
+    - `consolator list` for listing
+    - `consolator help` for help
+    - `consolator command_name/command_file.php` to run existing command (all the arguments and options are proxied)
+    - `consolator --help` to see command man page (available any command)
 
 Including library
 ```php
