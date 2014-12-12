@@ -3,16 +3,23 @@ Consolator
 
 Consolator- fast console application prototyping tool
 
+Requirements
+============
+    - PHP v5.5 and higher
+    - Phar extension
+    - *Nix OS
+
 Installation
 ============
 
-curl -XGET 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' | bash
+Run the following command from console
+`curl -XGET 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' | bash`
 
 Usage
 =====
 
 Using command line util
-`$: consolator list`
+`consolator list`
 
 Including library
 ```php

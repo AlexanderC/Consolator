@@ -145,9 +145,8 @@ EOF;
 $pharBinaryNoShebang = __DIR__ . '/../build/consolator.noshebang.phar';
 $pharBinary = __DIR__ . '/../build/consolator.phar';
 
-if(is_file($pharBinary)) {
-    unlink($pharBinary);
-}
+@unlink($pharBinaryNoShebang);
+@unlink($pharBinary);
 
 $compiler = new Compiler($pharBinary);
 
