@@ -11,6 +11,7 @@ namespace AlexanderC\Consolator\Command\Implementation;
 
 use AlexanderC\Consolator\Command\AbstractCommand;
 use AlexanderC\Consolator\Command\Helper\MultiName;
+use AlexanderC\Consolator\Command\Implementation\Helper\CommandPrototype;
 use AlexanderC\Consolator\Command\Input\AbstractInput;
 use AlexanderC\Consolator\Command\Output\AbstractOutput;
 
@@ -44,7 +45,13 @@ class RunCommand extends AbstractCommand
      */
     public function getHelp()
     {
-        return '/f[inverted]./console run commandFile [--show-help]';
+        return <<<EOF
+/f[inverted] ./console run command [--proto][--show-help]/!f
+/f[green]Options:
+    command - command file path or existing command name
+    --proto - run command prototype
+    --show-help - show command help
+EOF;
     }
 
     /**
@@ -60,14 +67,17 @@ class RunCommand extends AbstractCommand
         $commandFile = $input->get('commandFile', null, AbstractInput::ARGUMENT);
         $realCommandFile = sprintf("%s/%s", rtrim(getcwd(), '/'), ltrim($commandFile, '/'));
         $showHelp = $input->has('show-help', AbstractInput::LONG_OPTION);
+        $isPrototype = $input->has('proto', AbstractInput::LONG_OPTION);
 
         if(empty($commandFile)) {
             throw new \RuntimeException("Command file/name must be provided");
         }
 
+        $commandOutput = clone $output;
         $commandInput = $input->cloneFiltered(function($value, $key, $type) {
             return !($type === AbstractInput::ARGUMENT && $key === 'commandFile')
-                && !($type === AbstractInput::LONG_OPTION && $key === 'show-help');
+                && !($type === AbstractInput::LONG_OPTION && $key === 'show-help')
+                && !($type === AbstractInput::LONG_OPTION && $key === 'proto');
         });
 
         if($showHelp) {
@@ -75,10 +85,27 @@ class RunCommand extends AbstractCommand
         }
 
         if(is_file($realCommandFile)) {
-            $command = $this->application->registerCommandFile(new \SplFileInfo($realCommandFile));
+            if($isPrototype) {
+                $prototype = new CommandPrototype();
 
-            if(!$command) {
-                throw new \RuntimeException(sprintf("Invalid command file given ('%s')", $realCommandFile));
+                $include = function() use ($prototype, $realCommandFile) {
+                    $p = $prototype;
+
+                    require($realCommandFile);
+                };
+                $include();
+
+                if($showHelp) {
+                    $output->writeln("/f[inverted+green]%s/!f", [$prototype->help]);
+                }
+
+                return $prototype->run($commandInput, $commandOutput);
+            } else {
+                $command = $this->application->registerCommandFile(new \SplFileInfo($realCommandFile));
+
+                if(!$command) {
+                    throw new \RuntimeException(sprintf("Invalid command file given ('%s')", $realCommandFile));
+                }
             }
         } else {
             $command = $this->application->resolveCommand($commandFile);
@@ -88,6 +115,6 @@ class RunCommand extends AbstractCommand
             }
         }
 
-        return $this->application->runCommand($command, $commandInput, clone $output);
+        return $this->application->runCommand($command, $commandInput, $commandOutput);
     }
 } 

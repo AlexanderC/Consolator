@@ -72,4 +72,17 @@ class ExampleCommand extends \AlexanderC\Consolator\Command\AbstractCommand
 }
 ```
 
+...but, you can prototype with ease
+```php
+<?php
+$p->help = "Prototype test help...";
+$p->command = function($i, $o) {
+    $name = $i->get('name', 'Anonymous');
+    $o->writeln("Your name is %s", [$name]);
+    return 0;
+};
+
+// ...run it: consolator ./test/cmd.php --proto
+```
+
 For more examples check `./test/` directory.
