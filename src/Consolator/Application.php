@@ -197,9 +197,7 @@ class Application
                     $fileBase = str_replace('\\', '/', mb_substr($class, mb_strlen($classPrefix) - 1));
                     $realFilePath = $path . ltrim($fileBase, '/') . '.php';
 
-                    if(is_file($realFilePath)) {
-                        require_once($realFilePath);
-                    }
+                    require($realFilePath);
                 }
 
                 return false;
