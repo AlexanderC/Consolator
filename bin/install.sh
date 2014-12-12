@@ -6,13 +6,11 @@ CSL_BINARY="https://raw.githubusercontent.com/AlexanderC/Consolator/master/build
 CSL_INCLUDE="https://raw.githubusercontent.com/AlexanderC/Consolator/master/build/consolator.noshebang.phar"
 INCLUDE_PATH=$(${PHP} -r "echo rtrim(explode(':', ltrim(get_include_path(), '.:'))[0], '/');")
 
-echo ""
-echo "Adding consolator.phar to include path "${INCLUDE_PATH}
-curl -XGET ${CSL_INCLUDE} --output ${INCLUDE_PATH}"/consolator.phar"
-echo ""
-echo "Adding consolator to the binaries path "${BINARY_PATH}
-curl -XGET ${CSL_BINARY} --output ${BINARY_PATH}"/consolator"
+echo "+ Adding consolator.phar to include path "${INCLUDE_PATH}
+rm -f ${INCLUDE_PATH}"/consolator.phar"
+curl -XGET ${CSL_INCLUDE} --output ${INCLUDE_PATH}"/consolator.phar" --progress-bar --insecure
+echo "+ Adding consolator to the binaries path "${BINARY_PATH}
+rm -f ${BINARY_PATH}"/consolator"
+curl -XGET ${CSL_BINARY} --output ${BINARY_PATH}"/consolator" --progress-bar --insecure
 chmod +x ${BINARY_PATH}"/consolator"
-echo ""
-echo "Done!"
-echo ""
+echo "  Done!"
