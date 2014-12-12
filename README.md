@@ -37,7 +37,7 @@ $application->terminate($application->run());
 
 Command example
 ```php
-<?php
+<?php #CSL::CMD(My\NS\ExampleCommand)
 namespace My\NS;
 
 class ExampleCommand extends \AlexanderC\Consolator\Command\AbstractCommand
