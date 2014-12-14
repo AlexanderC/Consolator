@@ -48,10 +48,13 @@ class RunCommand extends AbstractCommand
     public function getHelp()
     {
         return <<<EOF
-/f[inverted] ./console run command [--proto][--show-help]/!f
+/f[inverted] ./console run command [--proto][--remote][--gist][--no-cache][--show-help]/!f
 /f[green]Options:
     command - command file path or existing command name
     --proto - run command prototype
+    --remote - execute remove scripts (download from URL)
+    --gist - execute a gist (using gist URL)
+    --no-cache - do not cache remote script used
     --show-help - show command help
 EOF;
     }
@@ -71,6 +74,7 @@ EOF;
         $isPrototype = $input->has('proto', AbstractInput::LONG_OPTION);
         $isGist = $input->has('gist', AbstractInput::LONG_OPTION);
         $isRemote = $input->has('remote', AbstractInput::LONG_OPTION) || $isGist;
+        $noCache = $input->has('no-cache', AbstractInput::LONG_OPTION);
 
         if(empty($commandFile)) {
             throw new \RuntimeException("Command file/name/url must be provided");
@@ -82,6 +86,7 @@ EOF;
                 && !($type === AbstractInput::LONG_OPTION && $key === 'show-help')
                 && !($type === AbstractInput::LONG_OPTION && $key === 'proto')
                 && !($type === AbstractInput::LONG_OPTION && $key === 'remote')
+                && !($type === AbstractInput::LONG_OPTION && $key === 'no-cache')
                 && !($type === AbstractInput::LONG_OPTION && $key === 'gist');
         });
 
@@ -105,7 +110,7 @@ EOF;
                 sha1($commandFile)
             );
 
-            if(!is_file($realCommandFile)) {
+            if(!is_file($realCommandFile) || $noCache) {
                 passthru(sprintf(
                     "curl %s --output %s --progress-bar --insecure",
                     escapeshellarg($commandFile),
