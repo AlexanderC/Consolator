@@ -26,9 +26,9 @@ class Compiler
     }
 
     /**
-     * @param bool $shebang
+     * @param bool $binary
      */
-    public function compile($shebang = false)
+    public function compile($binary = false)
     {
         $phar = new \Phar($this->outputFile, 0, $this->alias);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -45,7 +45,7 @@ class Compiler
             }
         }
 
-        $phar->setStub($this->getStub($shebang));
+        $phar->setStub($this->getStub($binary));
 
         $phar->stopBuffering();
     }
@@ -84,16 +84,18 @@ class Compiler
     }
 
     /**
-     * @param bool $shebang
+     * @param bool $binary
      * @return string
      */
-    protected function getStub($shebang)
+    protected function getStub($binary)
     {
-        $prefix = $shebang ? "#!/usr/bin/env php\n<?php" : "<?php";
+        $code = "<?php\n";
 
-        return <<<EOF
-{$prefix}
+        if($binary) {
+            $code = "#!/usr/bin/env php\n" . $code;
+        }
 
+        $code .= <<<EOF
 if(strtolower(php_sapi_name()) !== 'cli') {
     throw new \RuntimeException("CLI sapi is only allowed.");
 }
@@ -101,7 +103,10 @@ if(strtolower(php_sapi_name()) !== 'cli') {
 \Phar::mapPhar('{$this->alias}');
 
 require 'phar://{$this->alias}/src/bootstrap.php';
+EOF;
 
+        if($binary) {
+            $code .= <<<EOF
 global \$argv;
 
 if(basename(\$argv[0]) === basename(__FILE__)) {
@@ -115,9 +120,10 @@ if(basename(\$argv[0]) === basename(__FILE__)) {
     ]);
     \$application->terminate(\$application->run());
 }
-
-__HALT_COMPILER();
 EOF;
+        }
+
+        return $this->stripWhitespace($code . "\n__HALT_COMPILER();");
     }
 
     /**

@@ -28,6 +28,8 @@ class Application
 {
     const COMMAND_REGEX = "/#\s*CSL\s*::\s*CMD\s*\(\s*(?P<commandClass>[^\)\s]+)\s*\)/ui";
     const HELP_OPTION = 'help';
+    const VERSION_OPTION = 'version';
+    const VERSION = '1.0';
 
     /**
      * @var Config
@@ -146,6 +148,15 @@ class Application
 
         $input = is_object($input) && $input instanceof AbstractInput ? $input : new StdInput($argv);
         $output = is_object($output) && $output instanceof AbstractOutput ? $output : new StdOutput();
+
+        if($input->has(self::VERSION_OPTION, AbstractInput::LONG_OPTION)) {
+            $output->writeln(
+                '/f[green]Consolator version %s/!f',
+                [self::VERSION]
+            );
+
+            return 0;
+        }
 
         $command = $this->resolveCommand($commandName);
 

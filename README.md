@@ -3,6 +3,14 @@ Consolator
 
 Consolator- fast console application prototyping tool
 
+Features
+========
+    - fast prototyping
+    - full featured scripts
+    - small footprint
+    - one line installer
+    - run remote code (supports gist)
+
 Requirements
 ============
     - PHP v5.5 and higher

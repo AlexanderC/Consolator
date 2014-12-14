@@ -23,6 +23,8 @@ class RunCommand extends AbstractCommand
 {
     const NAME = 'run';
     const SHORT_NAME = 'r';
+    const GIST_TPL = 'https://gist.githubusercontent.com/%s/%s/raw//';
+    const GIST_REGEX = "#^https://gist.github.com/(?P<author>[^/]+)/(?P<id>[^/]+)$#ui";
 
     /**
      * @return string|MultiName
@@ -65,23 +67,53 @@ EOF;
 
         $command = null;
         $commandFile = $input->get('commandFile', null, AbstractInput::ARGUMENT);
-        $realCommandFile = sprintf("%s/%s", rtrim(getcwd(), '/'), ltrim($commandFile, '/'));
         $showHelp = $input->has('show-help', AbstractInput::LONG_OPTION);
         $isPrototype = $input->has('proto', AbstractInput::LONG_OPTION);
+        $isGist = $input->has('gist', AbstractInput::LONG_OPTION);
+        $isRemote = $input->has('remote', AbstractInput::LONG_OPTION) || $isGist;
 
         if(empty($commandFile)) {
-            throw new \RuntimeException("Command file/name must be provided");
+            throw new \RuntimeException("Command file/name/url must be provided");
         }
 
         $commandOutput = clone $output;
         $commandInput = $input->cloneFiltered(function($value, $key, $type) {
             return !($type === AbstractInput::ARGUMENT && $key === 'commandFile')
                 && !($type === AbstractInput::LONG_OPTION && $key === 'show-help')
-                && !($type === AbstractInput::LONG_OPTION && $key === 'proto');
+                && !($type === AbstractInput::LONG_OPTION && $key === 'proto')
+                && !($type === AbstractInput::LONG_OPTION && $key === 'remote')
+                && !($type === AbstractInput::LONG_OPTION && $key === 'gist');
         });
 
         if($showHelp) {
             $commandInput->add('help', true, AbstractInput::LONG_OPTION);
+        }
+
+        if($isRemote) {
+            if($isGist) {
+                if(!preg_match(self::GIST_REGEX, $commandFile, $matches)) {
+                    throw new \RuntimeException("Invalid gist url given");
+                }
+
+                $commandFile = sprintf(self::GIST_TPL, $matches['author'], $matches['id']);
+            }
+
+            $realCommandFile = sprintf(
+                "%s/CSL_REMOTE_%s_%s.php",
+                sys_get_temp_dir(),
+                md5($commandFile),
+                sha1($commandFile)
+            );
+
+            if(!is_file($realCommandFile)) {
+                passthru(sprintf(
+                    "curl %s --output %s --progress-bar --insecure",
+                    escapeshellarg($commandFile),
+                    $realCommandFile
+                ));
+            }
+        } else {
+            $realCommandFile = sprintf("%s/%s", rtrim(getcwd(), '/'), ltrim($commandFile, '/'));
         }
 
         if(is_file($realCommandFile)) {
