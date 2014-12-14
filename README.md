@@ -108,7 +108,7 @@ return function($i, $o) {
 // ...run it: consolator ./test/prototypeCallable.php --name="John Doe" --proto
 ```
 
-not enough? than try:
+not enough? than try this:
 ```php
 $name = $i->get('name', 'Anonymous');
 $o->writeln("/f[green]Your name is /f[blink+inverted]%s/!f", [$name]);
