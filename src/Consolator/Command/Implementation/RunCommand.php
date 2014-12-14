@@ -128,7 +128,11 @@ EOF;
                 $include = function() use ($prototype, $realCommandFile) {
                     $p = $prototype;
 
-                    require($realCommandFile);
+                    $callable = require($realCommandFile);
+
+                    if(is_callable($callable)) {
+                        $prototype->command = $callable;
+                    }
                 };
                 $include();
 

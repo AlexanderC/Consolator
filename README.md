@@ -80,7 +80,7 @@ class ExampleCommand extends \AlexanderC\Consolator\Command\AbstractCommand
 }
 ```
 
-...but, you can prototype with ease
+...but, you can prototype with ease!
 ```php
 <?php
 $p->help = "Prototype test help...";
@@ -90,7 +90,19 @@ $p->command = function($i, $o) {
     return 0;
 };
 
-// ...run it: consolator ./test/cmd.php --name="John Doe" --proto
+// ...run it: consolator ./test/prototype.php --name="John Doe" --proto
+```
+
+..or even so:
+```php
+<?php
+return function($i, $o) {
+    $name = $i->get('name', 'Anonymous');
+    $o->writeln("/f[green]Your name is /f[blink+inverted]%s/!f", [$name]);
+    return 0;
+};
+
+// ...run it: consolator ./test/prototypeCallable.php --name="John Doe" --proto
 ```
 
 For more examples check `./test/` directory.
