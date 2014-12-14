@@ -160,7 +160,7 @@ $compiler->compile($shebang = false);
 rename($pharBinary, $pharBinaryNoShebang);
 $compiler->compile($shebang = true);
 
-passthru(sprintf("chmod +x %s", escapeshellarg($pharBinary)));
+passthru(sprintf("chmod a+x %s", escapeshellarg($pharBinary)));
 
 echo "  Successfully compiled.\n";
 
