@@ -1,15 +1,16 @@
 Consolator
 ==========
 
-Consolator- fast console application prototyping tool
+Consolator- fast console(terminal) application prototyping tool built with KISS in mind. 
+
+The main goal of the project is to provide to the developers a small library & terminal command for building, using and maintaining terminal applications without headache.
 
 Features
 ========
-    - fast prototyping
-    - full featured scripts
+    - fast prototyping 
     - small footprint
     - one line installer
-    - run remote code (supports gist)
+    - remote commands (supports gist)
 
 Requirements
 ============
@@ -20,7 +21,7 @@ Requirements
 Installation
 ============
 
-Run the following command from console
+Run the following command from terminal
 `sudo sh -c "curl 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' --progress-bar --insecure | bash"`
 
 Usage
