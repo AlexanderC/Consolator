@@ -3,7 +3,7 @@ Consolator
 
 Consolator- fast console(terminal) application prototyping tool built with KISS in mind. 
 
-The main goal of the project is to provide to the developers a small library & terminal command for building, using and maintaining terminal applications without headache.
+The main goal of the project is to provide to the developers a small library & terminal command for building, using and maintaining terminal applications without pain.
 
 Features
 ========
