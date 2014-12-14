@@ -12,5 +12,5 @@ curl -XGET ${CSL_INCLUDE} --output ${INCLUDE_PATH}"/consolator.phar" --progress-
 echo "+ Adding consolator to the binaries path "${BINARY_PATH}
 rm -f ${BINARY_PATH}"/consolator"
 curl -XGET ${CSL_BINARY} --output ${BINARY_PATH}"/consolator" --progress-bar --insecure
-chmod +x ${BINARY_PATH}"/consolator"
+chmod a+x ${BINARY_PATH}"/consolator"
 echo "  Done!"

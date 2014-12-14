@@ -13,7 +13,7 @@ Installation
 ============
 
 Run the following command from console
-`curl -XGET 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' | bash`
+`sudo sh -c "curl -XGET 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' | bash"`
 
 Usage
 =====
