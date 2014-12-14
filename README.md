@@ -26,6 +26,8 @@ Run the following command from console
 Usage
 =====
 
+Here's a simple example: `consolator https://gist.github.com/AlexanderC/183212d11a0b5a82a8ca --gist --proto --no-cache`
+
 Using command line util:
 
     - `consolator list` for listing
