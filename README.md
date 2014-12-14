@@ -107,4 +107,12 @@ return function($i, $o) {
 // ...run it: consolator ./test/prototypeCallable.php --name="John Doe" --proto
 ```
 
+not enough? than try:
+```php
+$name = $i->get('name', 'Anonymous');
+$o->writeln("/f[green]Your name is /f[blink+inverted]%s/!f", [$name]);
+
+// ...run it: consolator ./test/prototypeContent.php --name="John Doe" --proto
+```
+
 For more examples check `./test/` directory.

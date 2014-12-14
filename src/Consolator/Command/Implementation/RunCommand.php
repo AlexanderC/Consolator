@@ -124,17 +124,7 @@ EOF;
         if(is_file($realCommandFile)) {
             if($isPrototype) {
                 $prototype = new CommandPrototype();
-
-                $include = function() use ($prototype, $realCommandFile) {
-                    $p = $prototype;
-
-                    $callable = require($realCommandFile);
-
-                    if(is_callable($callable)) {
-                        $prototype->command = $callable;
-                    }
-                };
-                $include();
+                $prototype->loadFile($realCommandFile);
 
                 if($showHelp) {
                     $output->writeln("/f[inverted+green]%s/!f", [$prototype->help]);

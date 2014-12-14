@@ -42,4 +42,52 @@ class CommandPrototype
 
         return AbstractCommand::SUCCESS;
     }
+
+    /**
+     * @param string $file
+     * @return $this
+     */
+    public function loadFile($file)
+    {
+        $p = $this;
+        $prototype = $this;
+
+        @ob_end_flush();
+        ob_start();
+        $callable = require($file);
+        $code = ob_get_clean();
+
+        if(!is_callable($this->command)) {
+            $this->command = is_callable($callable) ? $callable : $this->createCallable($code);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $code
+     * @return callable
+     */
+    protected function createCallable($code)
+    {
+        $functionBody = <<<EOF
+\$i = \$input;
+\$o = \$output;
+
+try {
+    {$code}
+} catch(\Exception \$e) {
+    \$output->writeln(
+        "/f[red]Exception of type '%s' thrown: /f[inverted]%s\n\n/b[red]/f[white]%s/!f",
+        [get_class(\$e), \$e->getMessage(), \$e->getTraceAsString()]
+    );
+
+    return 1;
+}
+
+return 0;
+EOF;
+
+        return create_function('$input,$output', $functionBody);
+    }
 }
