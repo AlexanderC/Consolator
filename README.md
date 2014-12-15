@@ -21,8 +21,11 @@ Requirements
 Installation
 ============
 
-Run the following command from terminal
-`sudo sh -c "curl 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' --progress-bar --insecure | bash"`
+Run the following command from terminal: `sudo sh -c "curl 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' --progress-bar --insecure | bash"`
+
+Update
+======
+Run the following command from terminal: `consolator self-update`
 
 Usage
 =====
