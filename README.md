@@ -26,8 +26,8 @@ Run the following command from terminal
 
 Docs
 ====
-    - [Basic examples and use cases](tree/master/doc/basics.md)
-    - [I/O](tree/master/doc/IO.md)
+    - [Basic examples and use cases](https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md)
+    - [I/O](https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md)
 
 Usage
 =====
