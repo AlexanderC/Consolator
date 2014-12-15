@@ -1,19 +1,6 @@
 #!/bin/bash
 
 PHP="php"
-
-if [ ! -x ${PHP} ]; then
-    echo "No PHP executable found"
-    exit 1
-fi
-
-IS_PHP_OK=$(${PHP} -r "echo (int) version_compare(PHP_VERSION, '5.5.0', '>=');")
-
-if [ 0 == ${IS_PHP_OK} ]; then
-    echo "Consider updating PHP at least to PHP v5.5"
-    exit 1
-fi
-
 UUID=$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 BINARY_PATH=$(dirname ${PHP})
 CSL_BINARY="https://raw.githubusercontent.com/AlexanderC/Consolator/master/build/consolator.phar?___="${UUID}
