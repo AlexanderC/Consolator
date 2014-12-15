@@ -26,8 +26,8 @@ Run the following command from terminal
 
 Docs
 ====
-    - <a href="https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md">Basic examples and use cases</a>
-    - <a href="https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md">I/O</a>
+[Basic examples and use cases](https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md)
+[I/O](https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md)
 
 Usage
 =====
