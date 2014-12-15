@@ -31,3 +31,4 @@ Here's a simple example: `consolator https://gist.github.com/AlexanderC/183212d1
 
 ####[Basic examples and use cases](https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md)
 ####[I/O](https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md)
+####[API Documentation](http://alexanderc.github.io/Consolator/io-docs/index.html)
