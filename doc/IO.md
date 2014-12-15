@@ -3,7 +3,7 @@ Input
 
 By default is used `StdInput` that reads all the arguments and options from `$argv`.
 
-Input types:
+#####Input types:
 ```php
     const ALL = 0x001;
     const OPTION = 0x002;
@@ -11,7 +11,8 @@ Input types:
     const ARGUMENT = 0x008;
 ```
 
-Api:
+#####Api:
+
     - `$i->defineArguments('somearg', 'someotherarg')` - this method is used to set names to the arguments provided instead of regular indexes(`0`, `1` etc.)
     - `$i->all($type = self::ALL)` - retrieve all the input by its type
     - `$i->has($name, $type = self::ALL)` - check for input variable availability
@@ -22,19 +23,21 @@ Output
 
 By default is used `StdOutput` that flushes the output to the regular `stdout`.
 
-Api:
+#####Api:
+
     - `$o->write($message, array $parameters = null)` - output a message. Parameters are provided to the `vsprintf()`
     - `$o->writeln($message, array $parameters = null)` - do the same as `write()` and add a new line to the end of message
 
-Color output:
+#####Color output:
 `"/b[white]/f[blink+green]some message here/!f/!b"` - would output a green text on a white background that blinks.
 
-Explanation of colored output:
+#####Explanation of colored output:
+
     - `/f[...]` - set foreground (can be combined with the `+` sign)
     - `/b[...]` - set background
     - `/!f` & `/!b` - are aliases that terminates colored output and reset output to the defaults
     
-Available colors:
+#####Available colors:
 ```php
     protected $backgroundMapping = [
         'black' => '40',

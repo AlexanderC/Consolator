@@ -9,7 +9,7 @@ Command line
 Library usage
 =============
 
-Create own command line tool:
+#####Create own command line tool:
 ```php
 #!/usr/bin/env php
 <?php 
@@ -23,7 +23,7 @@ $application = \AlexanderC\Consolator\bootstrap([
 $application->terminate($application->run());
 ```
 
-Register command line examples:
+#####Register command line examples:
 ```php
 <?php #CSL::CMD(My\NS\ExampleCommand)
 namespace My\NS;
@@ -56,7 +56,7 @@ class ExampleCommand extends \AlexanderC\Consolator\Command\AbstractCommand
 }
 ```
 
-...but, you can prototype with ease!
+#####...but, you can prototype with ease!
 ```php
 <?php
 $p->help = "Prototype test help...";
@@ -69,7 +69,7 @@ $p->command = function($i, $o) {
 // ...run it: consolator ./test/prototype.php --name="John Doe" --proto
 ```
 
-..or even so:
+#####...or even so:
 ```php
 <?php
 return function($i, $o) {
@@ -81,7 +81,7 @@ return function($i, $o) {
 // ...run it: consolator ./test/prototypeCallable.php --name="John Doe" --proto
 ```
 
-not enough? than try this:
+#####not enough? than try this:
 ```php
 $name = $i->get('name', 'Anonymous');
 $o->writeln("/f[green]Your name is /f[blink+inverted]%s/!f", [$name]);
