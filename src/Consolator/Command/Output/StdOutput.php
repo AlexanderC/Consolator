@@ -24,13 +24,17 @@ class StdOutput extends AbstractOutput
     protected $formatters = [];
 
     /**
+     * @var resource
+     */
+    protected $outStream;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct()
     {
-        ob_implicit_flush(1);
-
         $this->formatters[] = new ColorFormatter();
+        $this->outStream = fopen('php://stdout', 'w');
     }
 
     /**
@@ -40,7 +44,7 @@ class StdOutput extends AbstractOutput
      */
     public function write($message, array $parameters = null)
     {
-        echo $this->format(vsprintf($message, $parameters));
+        fwrite($this->outStream, $this->format(vsprintf($message, $parameters)));
     }
 
     /**
@@ -50,8 +54,7 @@ class StdOutput extends AbstractOutput
      */
     public function writeln($message, array $parameters = null)
     {
-        echo $this->format(vsprintf($message, $parameters));
-        echo PHP_EOL;
+        $this->write($message . PHP_EOL, $parameters ? : []);
     }
 
     /**
@@ -72,6 +75,9 @@ class StdOutput extends AbstractOutput
      */
     public function flush()
     {
-        // we enabled implicit flushing...
+        if(is_resource($this->outStream)) {
+            fflush($this->outStream);
+            fclose($this->outStream);
+        }
     }
 }

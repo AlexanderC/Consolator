@@ -33,4 +33,12 @@ abstract class AbstractOutput
      * @return void
      */
     abstract public function flush();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __destruct()
+    {
+        $this->flush();
+    }
 } 
