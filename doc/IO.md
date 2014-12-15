@@ -12,10 +12,10 @@ Input types:
 ```
 
 Api:
-`$i->defineArguments('somearg', 'someotherarg')` - this method is used to set names to the arguments provided instead of regular indexes(`0`, `1` etc.)
-`$i->all($type = self::ALL)` - retrieve all the input by its type
-`$i->has($name, $type = self::ALL)` - check for input variable availability
-`$i->get($name, $defaultValue = null, $type = self::ALL)` - get input variable value by its type (default set to NULL if missing)
+    - `$i->defineArguments('somearg', 'someotherarg')` - this method is used to set names to the arguments provided instead of regular indexes(`0`, `1` etc.)
+    - `$i->all($type = self::ALL)` - retrieve all the input by its type
+    - `$i->has($name, $type = self::ALL)` - check for input variable availability
+    - `$i->get($name, $defaultValue = null, $type = self::ALL)` - get input variable value by its type (default set to NULL if missing)
 
 Output
 ======
@@ -23,8 +23,8 @@ Output
 By default is used `StdOutput` that flushes the output to the regular `stdout`.
 
 Api:
-`$o->write($message, array $parameters = null)` - output a message. Parameters are provided to the `vsprintf()`
-`$o->writeln($message, array $parameters = null)` - do the same as `write()` and add a new line to the end of message
+    - `$o->write($message, array $parameters = null)` - output a message. Parameters are provided to the `vsprintf()`
+    - `$o->writeln($message, array $parameters = null)` - do the same as `write()` and add a new line to the end of message
 
 Color output:
 `"/b[white]/f[blink+green]some message here/!f/!b"` - would output a green text on a white background that blinks.
