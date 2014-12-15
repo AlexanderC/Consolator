@@ -128,6 +128,7 @@ EOF;
 
                 if($showHelp) {
                     $output->writeln("/f[inverted+green]%s/!f", [$prototype->help]);
+                    return 0;
                 }
 
                 return $prototype->run($commandInput, $commandOutput);
