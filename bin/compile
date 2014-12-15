@@ -117,7 +117,7 @@ if(basename(\$argv[0]) === basename(__FILE__)) {
     if(isset(\$argv[0]) && strtolower(\$argv[0]) === 'self-update') {
         \$scriptUrl = "https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh?___=";
         \$scriptUrl .= uniqid(true);
-        passthru("sudo sh -c \"curl '{\$scriptUrl}' --progress-bar --insecure | bash\"");
+        passthru("sudo sh -c \"curl -XGET '{\$scriptUrl}' --progress-bar --insecure | bash\"");
         exit(0);
     }
 
