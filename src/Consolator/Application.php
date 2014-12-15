@@ -183,6 +183,28 @@ class Application
     }
 
     /**
+     * @param string $classPrefix
+     * @param string $path
+     * @return bool
+     */
+    public function registerAutoload($classPrefix, $path)
+    {
+        $classPrefix = trim($classPrefix, '\\') . '\\';
+        $path = str_replace('\\', '/', rtrim($path, '/\\')) . '/';
+
+        return spl_autoload_register(function($class) use ($classPrefix, $path) {
+            if(false !== stripos($class, $classPrefix)) {
+                $fileBase = str_replace('\\', '/', mb_substr($class, mb_strlen($classPrefix) - 1));
+                $realFilePath = $path . ltrim($fileBase, '/') . '.php';
+
+                require($realFilePath);
+            }
+
+            return false;
+        });
+    }
+
+    /**
      * @return void
      */
     protected function bootstrap()
@@ -200,19 +222,7 @@ class Application
         }
 
         foreach($autoloadMapping as $classPrefix => $path) {
-            $classPrefix = trim($classPrefix, '\\') . '\\';
-            $path = str_replace('\\', '/', rtrim($path, '/\\')) . '/';
-
-            spl_autoload_register(function($class) use ($classPrefix, $path) {
-                if(false !== stripos($class, $classPrefix)) {
-                    $fileBase = str_replace('\\', '/', mb_substr($class, mb_strlen($classPrefix) - 1));
-                    $realFilePath = $path . ltrim($fileBase, '/') . '.php';
-
-                    require($realFilePath);
-                }
-
-                return false;
-            });
+            $this->registerAutoload($classPrefix, $path);
         }
 
         $this->commands = new CommandsCollection();
