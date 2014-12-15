@@ -24,16 +24,10 @@ Installation
 Run the following command from terminal
 `sudo sh -c "curl 'https://raw.githubusercontent.com/AlexanderC/Consolator/master/bin/install.sh' --progress-bar --insecure | bash"`
 
-Docs
-====
-
-[Basic examples and use cases](https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md)
---------------------------------------------------------------------------------------------------
-
-[I/O](https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md)
----------------------------------------------------------------------
-
 Usage
 =====
 
 Here's a simple example: `consolator https://gist.github.com/AlexanderC/183212d11a0b5a82a8ca --name="John Doe" --gist --proto --no-cache`
+
+###[Basic examples and use cases](https://github.com/AlexanderC/Consolator/tree/master/doc/basics.md)
+###[I/O](https://github.com/AlexanderC/Consolator/tree/master/doc/IO.md)
